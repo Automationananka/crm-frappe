@@ -17,9 +17,9 @@ RUN apt-get update && \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the entrypoint script (matching your filename)
-COPY entrypoint.v2.sh /entrypoint.v2.sh
-RUN chmod +x /entrypoint.v2.sh
+# Copy the entrypoint script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 # Set working directory
 WORKDIR /home/frappe/frappe-bench
