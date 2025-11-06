@@ -1,0 +1,35 @@
+# Dockerfile for ERPNext on Railway with MySQL
+FROM frappe/erpnext:v15
+
+# Switch to root for installation
+USER root
+
+# Force cache bust for Railway rebuilds
+ARG CACHE_BUSTER=v15
+RUN echo "Building version: ${CACHE_BUSTER}"
+
+# Install required tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    default-mysql-client \
+    redis-tools \
+    netcat-openbsd \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the entrypoint script (matching your filename)
+COPY entrypoint.v2.sh /entrypoint.v2.sh
+RUN chmod +x /entrypoint.v2.sh
+
+# Set working directory
+WORKDIR /home/frappe/frappe-bench
+
+# Expose port (Railway will assign dynamically)
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000 || exit 1
+
+# Use the entrypoint script
+ENTRYPOINT ["/bin/bash", "/entrypoint.v2.sh"]
